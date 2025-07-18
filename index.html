@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Clock</title>
+  <style>
+    /* --- basic reset ---------------------------------------------------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0d0d0d;
+      color: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* --- layout --------------------------------------------------------- */
+    .container {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .city {
+      text-align: center;
+    }
+
+    .city-name {
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      opacity: 0.7;
+      margin-bottom: 0.4rem;
+    }
+
+    .time {
+      font-size: clamp(2.5rem, 6vw + 1rem, 6rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    @media (min-width: 600px) {
+      .container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="city" id="toronto">
+      <div class="city-name">Toronto</div>
+      <div class="time">--:--:--</div>
+    </div>
+    <div class="city" id="los-angeles">
+      <div class="city-name">Los Angeles</div>
+      <div class="time">--:--:--</div>
+    </div>
+    <div class="city" id="utc">
+      <div class="city-name">UTC</div>
+      <div class="time">--:--:--</div>
+    </div>
+  </main>
+
+  <script>
+    // Utility — returns date string HH:MM:SS given a Date object
+    function fmt(date) {
+      return date.toLocaleTimeString("en-CA", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+    }
+
+    // Gets Date object for specific tz w/out changing local tz
+    const forTZ = (tz) => new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+
+    const clocks = [
+      { el: document.querySelector("#toronto .time"), zone: "America/Toronto" },
+      { el: document.querySelector("#los-angeles .time"), zone: "America/Los_Angeles" },
+      { el: document.querySelector("#utc .time"), zone: "UTC" },
+    ];
+
+    function tick() {
+      clocks.forEach((c) => {
+        c.el.textContent = fmt(forTZ(c.zone));
+      });
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>
