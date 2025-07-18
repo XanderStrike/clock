@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>World Clock</title>
+  <title>Time</title>
   <style>
     /* --- basic reset ---------------------------------------------------- */
     * {
@@ -12,11 +12,28 @@
       box-sizing: border-box;
     }
 
+    /* design tokens */
+    :root {
+      --bg: #0d0d0d;
+      --fg: #fafafa;
+      --surface: #1a1a1a;
+      --border: #333;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #fafafa;
+        --fg: #111;
+        --surface: #f4f4f4;
+        --border: #ccc;
+      }
+    }
+
     html, body {
       height: 100%;
       font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #0d0d0d;
-      color: #fafafa;
+      background: var(--bg);
+      color: var(--fg);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -45,15 +62,40 @@
       letter-spacing: 0.05em;
     }
 
-    @media (min-width: 600px) {
-      .container {
-        grid-template-columns: repeat(3, 1fr);
-      }
+    /* --- converter ------------------------------------------------------ */
+    .converter {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      font-size: 0.85rem;
+      text-align: right;
     }
-  </style>
+    .converter button,
+    .converter select,
+    .converter input {
+      background: var(--surface);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: inherit;
+      cursor: pointer;
+    }
+    .converter form {
+      margin-top: 0.5rem;
+    }
+    .results {
+      margin-top: 0.5rem;
+      line-height: 1.4;
+    }
+    </style>
 </head>
 <body>
   <main class="container">
+    <div class="city" id="utc">
+      <div class="city-name">UTC</div>
+      <div class="time">--:--:--</div>
+    </div>
     <div class="city" id="toronto">
       <div class="city-name">Toronto</div>
       <div class="time">--:--:--</div>
@@ -62,11 +104,21 @@
       <div class="city-name">Los Angeles</div>
       <div class="time">--:--:--</div>
     </div>
-    <div class="city" id="utc">
-      <div class="city-name">UTC</div>
-      <div class="time">--:--:--</div>
-    </div>
   </main>
+
+  <div class="converter" id="converter">
+    <button id="toggle">Convert Time</button>
+    <form id="conv-form" style="display:none;">
+      <input type="text" id="base-time" placeholder="HH:MM (24h)" required />
+      <select id="base-zone">
+        <option value="America/Toronto">Toronto</option>
+        <option value="America/Los_Angeles">Los Angeles</option>
+        <option value="UTC">UTC</option>
+      </select>
+      <button type="submit">Show</button>
+      <div class="results" id="conv-results"></div>
+    </form>
+  </div>
 
   <script>
     // Utility — returns date string HH:MM:SS given a Date object
@@ -96,6 +148,65 @@
 
     tick();
     setInterval(tick, 1000);
+
+    // ------------------- converter logic ----------------------
+    const toggleBtn = document.getElementById("toggle");
+    const form = document.getElementById("conv-form");
+    const baseInput = document.getElementById("base-time");
+    const zoneSelect = document.getElementById("base-zone");
+    const resultsBox = document.getElementById("conv-results");
+
+    toggleBtn.addEventListener("click", () => {
+      form.style.display = form.style.display === "none" ? "block" : "none";
+      resultsBox.textContent = "";
+    });
+
+    // helper to find UTC timestamp that corresponds to a given HH:MM in a zone (today)
+    function getInstantForLocalTime(hhmm, zone) {
+      const [h, m] = hhmm.split(":" ).map(Number);
+      const today = new Date();
+      let candidate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0));
+      for (let i = 0; i < 1440; i++) {
+        const match = candidate.toLocaleTimeString("en-CA", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: zone,
+        });
+        if (match === `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`) {
+          return candidate; // found correct instant
+        }
+        candidate = new Date(candidate.getTime() + 60000); // +1 minute
+      }
+      return null;
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const timeVal = baseInput.value;
+      if (!timeVal) return;
+      const baseZone = zoneSelect.value;
+      const instant = getInstantForLocalTime(timeVal, baseZone);
+      if (!instant) {
+        resultsBox.textContent = "Could not calculate time.";
+        return;
+      }
+      let out = "";
+      [
+        { name: "Toronto", zone: "America/Toronto" },
+        { name: "Los Angeles", zone: "America/Los_Angeles" },
+        { name: "UTC", zone: "UTC" },
+      ].forEach((c) => {
+        const t = instant.toLocaleTimeString("en-CA", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: c.zone,
+        });
+        out += `${c.name}: ${t}\n`;
+      });
+      resultsBox.textContent = out.trim();
+    });
   </script>
 </body>
 </html>
