@@ -11,6 +11,52 @@ function fmt(date) {
 // Gets Date object for specific tz w/out changing local tz
 const forTZ = (tz) => new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
 
+// Links configuration management
+class LinksConfig {
+  constructor() {
+    this.defaultLinks = [
+      { name: "Google", url: "https://google.com" },
+      { name: "GitHub", url: "https://github.com" },
+      { name: "Stack Overflow", url: "https://stackoverflow.com" }
+    ];
+    this.links = this.loadConfig();
+    this.init();
+  }
+
+  loadConfig() {
+    const saved = localStorage.getItem('linksConfig');
+    return saved ? JSON.parse(saved) : this.defaultLinks;
+  }
+
+  saveConfig() {
+    localStorage.setItem('linksConfig', JSON.stringify(this.links));
+  }
+
+  init() {
+    this.renderLinks();
+  }
+
+  renderLinks() {
+    const container = document.getElementById('links-container');
+    container.innerHTML = '';
+    
+    this.links.forEach(link => {
+      const linkElement = document.createElement('a');
+      linkElement.href = link.url;
+      linkElement.textContent = link.name;
+      // linkElement.target = '_blank';
+      linkElement.className = 'sidebar-link';
+      container.appendChild(linkElement);
+    });
+  }
+
+  updateLinks(newLinks) {
+    this.links = newLinks;
+    this.saveConfig();
+    this.renderLinks();
+  }
+}
+
 // Configuration management
 class TimeZoneConfig {
   constructor() {
@@ -89,6 +135,7 @@ class TimeZoneConfig {
 
 // Initialize the configuration
 const config = new TimeZoneConfig();
+const linksConfig = new LinksConfig();
 
 // ------------------- converter logic ----------------------
 const toggleBtn = document.getElementById("toggle");
@@ -324,6 +371,106 @@ settingsModal.addEventListener('click', (e) => {
 
 // Initialize converter options
 updateConverterOptions();
+
+// ------------------- links management logic ----------------------
+const manageLinksBtn = document.getElementById('manage-links-btn');
+const linksModal = document.getElementById('links-modal');
+const closeLinksModal = document.getElementById('close-links-modal');
+const addLinkBtn = document.getElementById('add-link');
+const saveLinksBtn = document.getElementById('save-links');
+const cancelLinksBtn = document.getElementById('cancel-links');
+const linksList = document.getElementById('links-list');
+
+function openLinksModal() {
+  linksModal.classList.add('show');
+  renderLinksList();
+}
+
+function closeLinksModalHandler() {
+  linksModal.classList.remove('show');
+}
+
+function renderLinksList() {
+  linksList.innerHTML = '';
+  
+  linksConfig.links.forEach((link, index) => {
+    const item = createLinkItem(link.name, link.url);
+    linksList.appendChild(item);
+  });
+}
+
+function createLinkItem(name, url) {
+  const item = document.createElement('div');
+  item.className = 'link-item';
+  
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.placeholder = 'Link name';
+  nameInput.value = name;
+  nameInput.className = 'link-name-input';
+  
+  const urlInput = document.createElement('input');
+  urlInput.type = 'url';
+  urlInput.placeholder = 'https://example.com';
+  urlInput.value = url;
+  urlInput.className = 'link-url-input';
+  
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'remove-link';
+  removeBtn.textContent = '×';
+  removeBtn.onclick = () => {
+    if (linksList.children.length > 1) {
+      item.remove();
+    }
+  };
+  
+  item.appendChild(nameInput);
+  item.appendChild(urlInput);
+  item.appendChild(removeBtn);
+  
+  return item;
+}
+
+function addLink() {
+  const item = createLinkItem('', '');
+  linksList.appendChild(item);
+}
+
+function saveLinks() {
+  const newLinks = [];
+  const items = linksList.querySelectorAll('.link-item');
+  
+  items.forEach(item => {
+    const nameInput = item.querySelector('.link-name-input');
+    const urlInput = item.querySelector('.link-url-input');
+    
+    if (nameInput.value.trim() && urlInput.value.trim()) {
+      newLinks.push({
+        name: nameInput.value.trim(),
+        url: urlInput.value.trim()
+      });
+    }
+  });
+  
+  if (newLinks.length > 0) {
+    linksConfig.updateLinks(newLinks);
+    closeLinksModalHandler();
+  }
+}
+
+// Links modal event listeners
+manageLinksBtn.addEventListener('click', openLinksModal);
+closeLinksModal.addEventListener('click', closeLinksModalHandler);
+addLinkBtn.addEventListener('click', addLink);
+saveLinksBtn.addEventListener('click', saveLinks);
+cancelLinksBtn.addEventListener('click', closeLinksModalHandler);
+
+// Close links modal when clicking outside
+linksModal.addEventListener('click', (e) => {
+  if (e.target === linksModal) {
+    closeLinksModalHandler();
+  }
+});
 
 // Update converter options when settings change
 const originalUpdateTimeZones = config.updateTimeZones;

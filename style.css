@@ -33,9 +33,20 @@ html, body {
 }
 
 /* --- layout --------------------------------------------------------- */
+body {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
+  margin-left: 200px;
+}
+
 .container {
   display: grid;
   gap: 2rem;
+  flex: 1;
+  align-content: center;
+  justify-items: center;
 }
 
 .city {
@@ -346,4 +357,137 @@ html, body {
 .modal-actions button:first-child {
   background: var(--fg);
   color: var(--bg);
+}
+
+/* --- sidebar -------------------------------------------------------- */
+.sidebar {
+  width: 200px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.sidebar-header button {
+  background: none;
+  border: none;
+  color: var(--fg);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.sidebar-header button:hover {
+  background: var(--bg);
+}
+
+.links-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-link {
+  color: var(--fg);
+  text-decoration: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.sidebar-link:hover {
+  background: var(--bg);
+}
+
+.sidebar-link:active {
+  opacity: 0.7;
+}
+
+/* --- links modal ---------------------------------------------------- */
+.links-list {
+  margin-bottom: 1rem;
+}
+
+.link-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.link-name-input,
+.link-url-input {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.link-name-input:focus,
+.link-url-input:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.1);
+}
+
+.remove-link {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-end;
+  font-size: 0.8rem;
+}
+
+.remove-link:hover {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+#add-link {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+#add-link:hover {
+  background: var(--border);
 }

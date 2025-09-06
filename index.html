@@ -7,6 +7,16 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Links</h3>
+      <button id="manage-links-btn">⚙️</button>
+    </div>
+    <div class="links-container" id="links-container">
+      <!-- Links will be populated here -->
+    </div>
+  </aside>
+  
   <main class="container">
     <div class="city" id="utc">
       <div class="city-name">UTC</div>
@@ -59,6 +69,23 @@
         <div class="modal-actions">
           <button id="save-settings">Save</button>
           <button id="cancel-settings">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="links-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Manage Links</h2>
+        <button id="close-links-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="links-list" id="links-list"></div>
+        <button id="add-link">+ Add Link</button>
+        <div class="modal-actions">
+          <button id="save-links">Save</button>
+          <button id="cancel-links">Cancel</button>
         </div>
       </div>
     </div>
