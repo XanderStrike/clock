@@ -96,10 +96,27 @@ const form = document.getElementById("conv-form");
 const baseInput = document.getElementById("base-time");
 const zoneSelect = document.getElementById("base-zone");
 const resultsBox = document.getElementById("conv-results");
+const timeError = document.getElementById("time-error");
 
 toggleBtn.addEventListener("click", () => {
   form.style.display = form.style.display === "none" ? "block" : "none";
-  resultsBox.textContent = "";
+  if (form.style.display === "none") {
+    resetConverter();
+  }
+});
+
+// Real-time input validation
+baseInput.addEventListener("input", (e) => {
+  const value = e.target.value;
+  const timePattern = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+  
+  if (value && !timePattern.test(value)) {
+    timeError.classList.add("show");
+    baseInput.setCustomValidity("Invalid time format");
+  } else {
+    timeError.classList.remove("show");
+    baseInput.setCustomValidity("");
+  }
 });
 
 // helper to find UTC timestamp that corresponds to a given HH:MM in a zone (today)
@@ -122,29 +139,72 @@ function getInstantForLocalTime(hhmm, zone) {
   return null;
 }
 
+function formatTimeForDisplay(time, timeZone) {
+  return time.toLocaleTimeString("en-CA", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: timeZone,
+  });
+}
+
+function formatResults(instant) {
+  let resultsHTML = '';
+  
+  config.timeZones.forEach((c) => {
+    const time = formatTimeForDisplay(instant, c.zone);
+    const displayName = c.name.includes('/') ? c.name.split('/').pop() : c.name;
+    const displayCity = displayName.replace(/_/g, ' ');
+    
+    resultsHTML += `
+      <div class="result-item">
+        <span class="result-city">${displayCity}</span>
+        <span class="result-time">${time}</span>
+      </div>
+    `;
+  });
+  
+  return resultsHTML;
+}
+
+function showError(message) {
+  resultsBox.innerHTML = `<div class="error-message">${message}</div>`;
+  resultsBox.classList.remove('empty');
+}
+
+function resetConverter() {
+  form.reset();
+  resultsBox.innerHTML = "Results will appear here";
+  resultsBox.classList.add('empty');
+  timeError.classList.remove("show");
+}
+
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  const timeVal = baseInput.value;
-  if (!timeVal) return;
+  
+  const timeVal = baseInput.value.trim();
   const baseZone = zoneSelect.value;
-  const instant = getInstantForLocalTime(timeVal, baseZone);
-  if (!instant) {
-    resultsBox.textContent = "Could not calculate time.";
+  
+  // Validate inputs
+  if (!timeVal) {
+    showError("Please enter a time to convert");
     return;
   }
-  let out = "";
-  config.timeZones.forEach((c) => {
-    const t = instant.toLocaleTimeString("en-CA", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: c.zone,
-    });
-    // Strip everything before the last slash for display
-    const displayName = c.name.includes('/') ? c.name.split('/').pop() : c.name;
-    out += `${displayName.replace(/_/g, ' ')}: ${t}\n`;
-  });
-  resultsBox.textContent = out.trim();
+  
+  if (!baseZone) {
+    showError("Please select a time zone");
+    return;
+  }
+  
+  const instant = getInstantForLocalTime(timeVal, baseZone);
+  if (!instant) {
+    showError("Could not calculate time conversion");
+    return;
+  }
+  
+  const resultsHTML = formatResults(instant);
+  resultsBox.innerHTML = resultsHTML;
+  resultsBox.classList.remove('empty');
 });
 
 // ------------------- settings modal logic ----------------------
@@ -236,7 +296,7 @@ function saveSettings() {
 
 function updateConverterOptions() {
   const baseZone = document.getElementById('base-zone');
-  baseZone.innerHTML = '';
+  baseZone.innerHTML = '<option value="">Select time zone</option>';
   
   config.timeZones.forEach(tz => {
     const option = document.createElement('option');
