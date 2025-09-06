@@ -137,6 +137,51 @@ class TimeZoneConfig {
 const config = new TimeZoneConfig();
 const linksConfig = new LinksConfig();
 
+// ------------------- sidebar hover logic ----------------------
+const sidebar = document.getElementById('sidebar');
+const body = document.body;
+let sidebarTimeout;
+let isHoveringSidebar = false;
+
+function expandSidebar() {
+  sidebar.classList.add('expanded');
+  body.classList.add('sidebar-expanded');
+  isHoveringSidebar = true;
+}
+
+function collapseSidebar() {
+  sidebar.classList.remove('expanded');
+  body.classList.remove('sidebar-expanded');
+  isHoveringSidebar = false;
+}
+
+// Mouse position tracking for sidebar expansion
+document.addEventListener('mousemove', (e) => {
+  const mouseX = e.clientX;
+  const threshold = 200; // pixels from left edge
+  
+  if (mouseX <= threshold && !isHoveringSidebar) {
+    clearTimeout(sidebarTimeout);
+    sidebarTimeout = setTimeout(expandSidebar, 100);
+  } else if (mouseX > 200 && isHoveringSidebar && !sidebar.contains(e.target)) {
+    clearTimeout(sidebarTimeout);
+    sidebarTimeout = setTimeout(collapseSidebar, 300);
+  }
+});
+
+// Keep sidebar open when hovering over it
+sidebar.addEventListener('mouseenter', () => {
+  clearTimeout(sidebarTimeout);
+  if (!isHoveringSidebar) {
+    expandSidebar();
+  }
+});
+
+sidebar.addEventListener('mouseleave', () => {
+  clearTimeout(sidebarTimeout);
+  sidebarTimeout = setTimeout(collapseSidebar, 300);
+});
+
 // ------------------- converter logic ----------------------
 const toggleBtn = document.getElementById("toggle");
 const form = document.getElementById("conv-form");

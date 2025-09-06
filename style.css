@@ -38,6 +38,11 @@ body {
   align-items: stretch;
   justify-content: flex-start;
   padding: 0;
+  margin-left: 40px;
+  transition: margin-left 0.3s ease;
+}
+
+body.sidebar-expanded {
   margin-left: 200px;
 }
 
@@ -369,9 +374,15 @@ body {
   flex-direction: column;
   height: 100vh;
   position: fixed;
-  left: 0;
+  left: -200px;
   top: 0;
   overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 100;
+}
+
+.sidebar.expanded {
+  left: 0;
 }
 
 .sidebar-header {
