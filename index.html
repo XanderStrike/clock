@@ -36,6 +36,27 @@
     </form>
   </div>
 
+  <div class="settings">
+    <button id="settings-btn">⚙️ Settings</button>
+  </div>
+
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Time Zone Settings</h2>
+        <button id="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="timezone-list" id="timezone-list"></div>
+        <button id="add-timezone">+ Add Time Zone</button>
+        <div class="modal-actions">
+          <button id="save-settings">Save</button>
+          <button id="cancel-settings">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>

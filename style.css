@@ -81,3 +81,145 @@ html, body {
   margin-top: 0.5rem;
   line-height: 1.4;
 }
+
+/* --- settings ------------------------------------------------------- */
+.settings {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+}
+
+.settings button {
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+/* --- modal --------------------------------------------------------- */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.modal-header button {
+  background: none;
+  border: none;
+  color: var(--fg);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+.timezone-list {
+  margin-bottom: 1rem;
+}
+
+.timezone-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.timezone-select {
+  flex: 1;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.remove-timezone {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#add-timezone {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.modal-actions button {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-actions button:first-child {
+  background: var(--fg);
+  color: var(--bg);
+}
