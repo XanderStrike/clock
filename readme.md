@@ -1,0 +1,1 @@
+My minimal new tab page. All settings are stored locally.

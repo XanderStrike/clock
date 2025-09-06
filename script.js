@@ -15,9 +15,9 @@ const forTZ = (tz) => new Date(new Date().toLocaleString("en-US", { timeZone: tz
 class LinksConfig {
   constructor() {
     this.defaultLinks = [
-      { name: "Google", url: "https://google.com" },
-      { name: "GitHub", url: "https://github.com" },
-      { name: "Stack Overflow", url: "https://stackoverflow.com" }
+      { name: "Alex", url: "https://astandke.com" },
+      { name: "GitHub", url: "https://github.com/xanderstrike/clock" },
+      { name: "GMail", url: "https://mail.google.com/mail/u/0/" },
     ];
     this.links = this.loadConfig();
     this.init();
@@ -61,8 +61,8 @@ class LinksConfig {
 class TimeZoneConfig {
   constructor() {
     this.defaultTimeZones = [
-      { zone: "America/Toronto", name: "Toronto" },
       { zone: "America/Los_Angeles", name: "Los Angeles" },
+      { zone: "America/Toronto", name: "Toronto" },
       { zone: "UTC", name: "UTC" }
     ];
     this.timeZones = this.loadConfig();
