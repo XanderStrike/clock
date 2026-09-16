@@ -87,6 +87,16 @@ class TimeZoneConfig {
   renderClocks() {
     const container = document.querySelector('.container');
     container.innerHTML = '';
+
+    // Unix timestamp pinned to the top of the stack
+    const unixDiv = document.createElement('div');
+    unixDiv.className = 'city unix';
+    const unixTime = document.createElement('div');
+    unixTime.className = 'time';
+    unixTime.textContent = '------------';
+    unixDiv.appendChild(unixTime);
+    container.appendChild(unixDiv);
+    this.unixEl = unixTime;
     
     this.timeZones.forEach((tz, index) => {
       const cityDiv = document.createElement('div');
@@ -124,6 +134,9 @@ class TimeZoneConfig {
     this.clocks.forEach((c) => {
       c.el.textContent = fmt(forTZ(c.zone));
     });
+    if (this.unixEl) {
+      this.unixEl.innerHTML = spacedUnixHTML(Math.floor(Date.now() / 1000));
+    }
   }
 
   updateTimeZones(newTimeZones) {
@@ -197,12 +210,14 @@ toggleBtn.addEventListener("click", () => {
   }
 });
 
+const timePattern = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+const unixPattern = /^[0-9]{9,}$/;
+
 // Real-time input validation
 baseInput.addEventListener("input", (e) => {
   const value = e.target.value;
-  const timePattern = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
   
-  if (value && !timePattern.test(value)) {
+  if (value && !timePattern.test(value) && !unixPattern.test(value)) {
     timeError.classList.add("show");
     baseInput.setCustomValidity("Invalid time format");
   } else {
@@ -240,8 +255,24 @@ function formatTimeForDisplay(time, timeZone) {
   });
 }
 
+// returns an HTML string of digits, spaced every 3 from the right via CSS margin
+// (spacing is purely visual — copying yields plain digits)
+function spacedUnixHTML(ts) {
+  const digits = String(ts).split('');
+  const len = digits.length;
+  return digits.map((d, i) => {
+    const gap = (len - 1 - i) % 3 === 0 && i !== len - 1;
+    return gap ? `<span class="g3">${d}</span>` : d;
+  }).join('');
+}
+
 function formatResults(instant) {
-  let resultsHTML = '';
+  let resultsHTML = `
+    <div class="result-item">
+      <span class="result-city">Unix</span>
+      <span class="result-time">${spacedUnixHTML(Math.floor(instant.getTime() / 1000))}</span>
+    </div>
+  `;
   
   config.timeZones.forEach((c) => {
     const time = formatTimeForDisplay(instant, c.zone);
@@ -283,15 +314,25 @@ form.addEventListener("submit", (e) => {
     return;
   }
   
-  if (!baseZone) {
-    showError("Please select a time zone");
-    return;
-  }
-  
-  const instant = getInstantForLocalTime(timeVal, baseZone);
-  if (!instant) {
-    showError("Could not calculate time conversion");
-    return;
+  let instant;
+  if (unixPattern.test(timeVal)) {
+    // unix timestamp — timezone not needed
+    const ts = Number(timeVal);
+    instant = new Date(ts < 1e12 ? ts * 1000 : ts);
+    if (isNaN(instant.getTime())) {
+      showError("Invalid unix timestamp");
+      return;
+    }
+  } else {
+    if (!baseZone) {
+      showError("Please select a time zone");
+      return;
+    }
+    instant = getInstantForLocalTime(timeVal, baseZone);
+    if (!instant) {
+      showError("Could not calculate time conversion");
+      return;
+    }
   }
   
   const resultsHTML = formatResults(instant);

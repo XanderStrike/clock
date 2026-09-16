@@ -58,6 +58,22 @@ body.sidebar-expanded {
   text-align: center;
 }
 
+.city.unix .time {
+  font-size: clamp(0.9rem, 1.5vw + 0.3rem, 1.4rem);
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+}
+
+/* visual grouping of unix digits — margin instead of a real char so copy/paste works */
+.time .g3 {
+  margin-right: 0.35em;
+}
+
+.results .result-time .g3 {
+  margin-right: 0.4em;
+}
+
 .city-name {
   font-size: 1.2rem;
   letter-spacing: 0.05em;
